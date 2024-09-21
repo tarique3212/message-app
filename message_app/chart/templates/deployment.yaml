@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: message-app
+  namespace: {{.Values.message.namespace}}
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      name: message
+  template:
+    metadata:
+      labels:
+        name: message
+    spec:
+      containers:
+      - name: message-service
+        image: {{.Values.message.image}}:{{.Values.message.tag}}
+        imagePullPolicy: {{.Values.message.imagePullPolicy}}
+        env:
+        - name: POSTGRES_HOST
+          value: "postgres"  # Update if necessary
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: POSTGRES_DB
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: POSTGRES_PASSWORD
+        ports:
+        - containerPort: {{.Values.message.port}}
+
