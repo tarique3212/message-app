@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Message</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 300px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        label {
+            margin-top: 10px;
+            display: block;
+            color: #555;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #5cb85c;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #4cae4c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Create a New Message</h1>
+        <form action="/create" method="POST">
+            <label for="account_id">Account ID:</label>
+            <input type="text" id="account_id" name="account_id" required>
+            
+            <label for="sender_number">Sender Number:</label>
+            <input type="text" id="sender_number" name="sender_number" required>
+            
+            <label for="receiver_number">Receiver Number:</label>
+            <input type="text" id="receiver_number" name="receiver_number" required>
+            
+            <button type="submit">Send Message</button>
+        </form>
+    </div>
+</body>
+</html>
+

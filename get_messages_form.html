@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Messages</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Get Messages by Account ID</h1>
+        <form id="getMessagesForm">
+            <div class="mb-3">
+                <label for="account_id" class="form-label">Enter Account ID:</label>
+                <input type="text" id="account_id" name="account_id" class="form-control" required>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="submitGetMessages()">Get Messages</button>
+        </form>
+    </div>
+
+    <script>
+        function submitGetMessages() {
+            const accountId = document.getElementById('account_id').value;
+
+            if (accountId) {
+                const url = `/get/messages/${encodeURIComponent(accountId)}`;
+                window.location.href = url;  // Redirect to the constructed URL
+            }
+        }
+    </script>
+</body>
+</html>
+
