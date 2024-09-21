@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Created</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            width: 300px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .message-id {
+            color: green;
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #5cb85c;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+
+        a:hover {
+            background-color: #4cae4c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Message Created!</h1>
+        <p class="message-id">Your Message ID is: <strong>{{ message_id }}</strong></p>
+        <a href="/create">Create Another Message</a>
+    </div>
+</body>
+</html>
+
