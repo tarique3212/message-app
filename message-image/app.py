@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request, render_template
 import psycopg2
 import uuid
 import os
+import logging
 
 app = Flask(__name__)
 
@@ -12,6 +13,28 @@ def get_db_connection():
         user=os.environ.get('POSTGRES_USER'),
         password=os.environ.get('POSTGRES_PASSWORD')
     )
+
+log_file_path = os.environ.get('LOG_FILE_PATH', '/var/log/message-app.log')  # Default path
+logging.basicConfig(
+    filename=log_file_path,
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s:%(message)s'
+)
+
+@app.route('/health/live', methods=['GET'])
+def live():
+    """Liveness probe."""
+    return 'OK', 200  # This indicates the application is alive.
+
+@app.route('/health/ready', methods=['GET'])
+def ready():
+    """Readiness probe."""
+    # You might want to check database connectivity or other dependencies here
+    is_ready = True  # Replace this with actual readiness logic
+    if is_ready:
+        return 'OK', 200  # Ready to serve traffic
+    else:
+        return 'Service Unavailable', 503  # Not ready to serve traffic
 
 @app.route('/get/messages', methods=['GET'])
 def get_messages_form():
