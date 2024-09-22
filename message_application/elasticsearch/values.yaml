@@ -3,7 +3,7 @@ namespace: "elasticsearch"
 clusterName: "elasticsearch"
 nodeGroup: "master"
 storageName: "elasticsearch"
-capacityStorage: 30Gi
+capacityStorage: 1Gi
 
 # The service that non master groups will try to connect to when joining the cluster
 # This should be set to clusterName + "-" + nodeGroup for your master group
@@ -112,7 +112,7 @@ volumeClaimTemplate:
   accessModes: ["ReadWriteOnce"]
   resources:
     requests:
-      storage: 30Gi
+      storage: 1Gi
 
 rbac:
   create: false

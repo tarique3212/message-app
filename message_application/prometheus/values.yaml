@@ -7,7 +7,7 @@ prometheus:
   appname: prometheus
   version: v2.53.0
   serviceaccountnamespace: prom
-  storage: 50Gi
+  storage: 1Gi
   mountpath: /home/appviewx/appviewx/
 
 limits:

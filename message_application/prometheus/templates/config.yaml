@@ -8,15 +8,6 @@ metadata:
 data:
   prometheus.rules: |-
     groups:
-    - name: Test Alerts
-      rules:
-      - alert: TestAlert
-        expr: vector(1)  # Always true
-        for: 1m
-        annotations:
-          summary: "Test Alert"
-          description: "This is a test alert to check Alertmanager."
-
     - name: Pod Failure Alert
       rules:
       - alert: P0 - Service Impact - POD Failure 

@@ -6,7 +6,7 @@ alertmanager:
   appname: alertmanager
   version: v0.27.0
   serviceaccountnamespace: prom
-  storage: 50Gi
+  storage: 1Gi
   mountpath: /home/user
 
 destination:
