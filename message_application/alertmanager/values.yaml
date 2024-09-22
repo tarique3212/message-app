@@ -1,0 +1,27 @@
+# Commons
+common:
+  namespace: prom
+
+alertmanager:
+  appname: alertmanager
+  version: v0.27.0
+  serviceaccountnamespace: prom
+  storage: 50Gi
+  mountpath: /home/user
+
+destination:
+  webhookreceiver:
+    url: http://message-service.message.svc.cluster.local:5000
+    sendresolved: true
+  slackreceiver:
+    apiurl: https://hooks.slack.com/services/
+    channelname: <SlackChannel>
+  emailreceiver:
+    to: <Receiver_EmailID>
+    from: <Sender_EmailID>
+    smarthost: <SMTP_Server>:<Port>
+    authusername: <Account_EmailID>
+    authpassword: <Account_Password>
+    tlsrequired: true
+
+

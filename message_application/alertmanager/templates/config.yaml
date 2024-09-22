@@ -1,0 +1,122 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-config
+  namespace: {{ .Values.common.namespace }}
+data:
+  slack.tmpl: |-
+    {{`{{/* Template method used internally starts with __ */}}
+    {{ define "__alert_severity_prefix" -}}
+        {{ if eq .Status "firing" -}}
+          {{ if eq .CommonLabels.severity "critical" -}}
+          :red_circle:
+          {{- else if eq .CommonLabels.severity "warning" -}}
+          :large_yellow_circle:
+          {{- else -}}
+          :large_blue_circle:
+          {{- end }}
+        {{- else if eq .Status "resolved" -}}
+          :large_green_circle:
+        {{- end }}
+    {{- end }}
+    {{/* First line of Slack alerts */}}
+    {{ define "slack_alert_title" -}}
+        {{ template "__alert_severity_prefix" . }} {{ .CommonLabels.alertname -}}
+        {{ if eq .Status "resolved" }}
+          [{{- .Status | toUpper }}]
+        {{- end -}}
+    {{- end }}
+    {{/* Color of Slack attachment (appears as line next to alert )*/}}
+    {{ define "slack_alert_color" -}}
+        {{ if eq .Status "firing" -}}
+            {{ if eq .CommonLabels.severity "warning" -}}
+                warning
+            {{- else if eq .CommonLabels.severity "critical" -}}
+                danger
+            {{- else -}}
+                #439FE0
+            {{- end -}}
+        {{ else -}}
+        good
+        {{- end }}
+    {{- end }}
+    {{/* The test to display in the alert */}}
+    {{ define "slack_alert_text" -}}
+    Application: Application-Name
+    Application URL: Application-URL
+    {{ range .Alerts }}
+    *Alert:*  {{ .Annotations.title }}
+    *Description:* {{ .Annotations.description }}
+    *Details:* {{ range .Labels.SortedPairs }} 
+      • *{{ .Name }}:* {{ .Value }}
+    {{- end }}
+    {{- end }}
+    {{- end }}`}}
+  config.yml: |-
+    global:
+      resolve_timeout: 1m
+      pagerduty_url: 'https://events.pagerduty.com/v2/enqueue'
+    templates:
+    - '/etc/alertmanager/*.tmpl'
+    route:
+     group_by: ['alertname']
+     group_wait: 3s
+     group_interval: 5s
+     repeat_interval: 1h
+     receiver: slack-receiver
+     routes:
+       - receiver: "slack-receiver"
+         group_wait: 10s
+         match_re:
+           severity: critical|high
+         continue: true
+
+       - receiver: "pagerduty-receiver"
+         group_wait: 10s
+         match_re:
+           severity: critical|high
+         continue: true
+
+       - receiver: "webhook-receiver"
+         group_wait: 10s
+         match_re:
+           severity: critical|high
+           alertType: gatewayAlert
+         continue: true
+  
+       - receiver: "email-notification"
+         group_wait: 10s
+         match_re:
+           severity: critical|high
+         continue: true
+
+    receivers:
+    - name: 'slack-receiver'
+      slack_configs:
+      - api_url: {{ .Values.destination.slackreceiver.apiurl }}
+        channel: {{ .Values.destination.slackreceiver.channelname }}
+        send_resolved: true
+        icon_url: https://avatars3.githubusercontent.com/u/3380462
+        title: {{`'{{ template "slack_alert_title" . }}'`}}
+        color: {{`'{{ template "slack_alert_color" . }}'`}}
+        text: {{`'{{ template "slack_alert_text" . }}'`}}
+    
+    - name: 'pagerduty-receiver'
+      pagerduty_configs:
+      - routing_key: 87f4002942ec4606d0950b5a1c75783c 
+        send_resolved: false
+
+    - name: 'webhook-receiver'
+      webhook_configs:
+      - url: {{ .Values.destination.webhookreceiver.url }}
+        send_resolved: {{ .Values.destination.webhookreceiver.sendresolved }}
+      
+    - name: 'email-notification'
+      email_configs:
+      - to: {{ .Values.destination.emailreceiver.to }}
+        from: {{ .Values.destination.emailreceiver.from }}
+        smarthost: {{ .Values.destination.emailreceiver.smarthost }}
+        auth_username: {{ .Values.destination.emailreceiver.authusername }}
+        auth_password: {{ .Values.destination.emailreceiver.authpassword }}
+        require_tls: {{ .Values.destination.emailreceiver.tlsrequired }}
+        send_resolved: true

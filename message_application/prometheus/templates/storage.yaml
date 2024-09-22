@@ -1,0 +1,35 @@
+{{- $dot := . }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: prometheus-pv-claim
+  namespace: {{ $dot.Values.common.namespace }}
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ $dot.Values.prometheus.storage }}
+
+---
+{{- $dot := . }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: prometheus-pv-volume
+  namespace: {{ $dot.Values.common.namespace }}
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: {{ $dot.Values.prometheus.storage }}
+  accessModes:
+    - ReadWriteOnce
+  claimRef:
+    namespace: {{ $dot.Values.common.namespace }}
+    name: prometheus-pv-claim
+  hostPath:
+    path: "{{ $dot.Values.prometheus.mountpath }}/prometheus"
+

@@ -1,0 +1,109 @@
+{{- $dot := . }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-server-conf
+  namespace: {{ $dot.Values.common.namespace }}
+data:
+  prometheus.rules: |-
+    groups:
+    - name: Test Alerts
+      rules:
+      - alert: TestAlert
+        expr: vector(1)  # Always true
+        for: 1m
+        annotations:
+          summary: "Test Alert"
+          description: "This is a test alert to check Alertmanager."
+
+    - name: Pod Failure Alert
+      rules:
+      - alert: P0 - Service Impact - POD Failure 
+        expr: kube_pod_container_status_waiting_reason{reason=~"CrashLoopBackOff|Error|ImagePullBackOff",pod!~"prometheus.*"} > 0
+        for: 5m
+        annotations:
+          title: 'POD Failure'
+          description: 'POD Failures Detected (CrashLoopBack|Error|ImagePullback)'
+        labels:
+           severity: 'critical'   
+
+      - alert: P0 - Service Impact - OOM Exception
+        expr: kube_pod_container_status_terminated_reason{reason=~"OOMKilled",pod!~"prometheus.*"} > 0
+        for: 5m
+        annotations:
+          title: 'OOM Exception'
+          description: 'POD Failures - OOM Exception'
+        labels:
+          severity: 'critical'
+
+    - name: Unhealthy Node Alert
+      rules:
+      - alert: P0 - Service Degradation - Kube Node 'Not Ready'
+        expr: kube_node_status_condition{condition="Ready",status="unknown"} > 0
+        for: 5m
+        annotations:
+          title: 'Kube Node Not Ready'
+          description: 'Kube Node in Not Ready State'
+        labels:
+          severity: 'high'
+
+    - name: CPU Utilization Alert
+      rules:
+      - alert: P0 - Increased CPU Core Utilization
+        expr: (sum(rate(container_cpu_usage_seconds_total[5m])) by (instance)) / (sum(machine_cpu_cores) by (instance)) * 100 > 80
+        for: 5m
+        annotations:
+          title: 'Increased CPU Utilization'
+          description: 'CPU Utilization has exceeded 80% for 5 minutes.'
+        labels:
+          severity: 'critical'
+
+    - name: Memory Utilization Alert
+      rules:
+      - alert: P1 - Service Degradation - Increased Memory Utilization
+        expr: (sum(container_memory_usage_bytes) by (instance)) / (sum(node_memory_MemTotal_bytes) by (instance)) * 100 > 80
+        for: 5m
+        annotations:
+          title: 'Increased Memory Utilization'
+          description: 'Memory Utilization has exceeded 80% for 5 minutes.'
+        labels:
+          severity: 'high'
+
+    - name: Disk Utilization Alert
+      rules:
+      - alert: P1 - Service Degradation - Increased Disk Utilization
+        expr: (sum(node_filesystem_size_bytes{mountpoint!~".*(serviceaccount|proc|sys).*", device!="rootfs"}) by (instance) - sum(node_filesystem_avail_bytes{mountpoint!~".*(serviceaccount|proc|sys).*", device!="rootfs"}) by (instance)) / sum(node_filesystem_size_bytes{mountpoint!~".*(serviceaccount|proc|sys).*", device!="rootfs"}) by (instance) * 100 > 80
+        for: 5m
+        annotations:
+          title: 'Increased Disk Utilization'
+          description: 'Disk Utilization has exceeded 80% for 5 minutes.'
+        labels:
+          severity: 'high'
+
+  prometheus.yml: |-
+    global:
+      scrape_interval: 45s
+      evaluation_interval: 45s
+    rule_files:
+      - /etc/prometheus/prometheus.rules
+    alerting:
+      alertmanagers:
+      - scheme: http
+        static_configs:
+        - targets:
+          - "alertmanager.prom.svc:9093"
+
+    scrape_configs:
+      - job_name: 'kubernetes-pods'
+        kubernetes_sd_configs:
+        - role: pod
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+          action: keep
+          regex: true
+
+      - job_name: 'kubernetes-nodes'
+        kubernetes_sd_configs:
+        - role: node
+

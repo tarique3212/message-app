@@ -1,0 +1,20 @@
+# Commons
+common:
+  namespace: prom
+  proxy_namespace: 
+  userid: 
+prometheus:
+  appname: prometheus
+  version: v2.53.0
+  serviceaccountnamespace: prom
+  storage: 50Gi
+  mountpath: /home/appviewx/appviewx/
+
+limits:
+  cpu_limit: 80
+  memory_limit: 80
+  disk_limit: 80
+  timelimit_cpu_memory: 5
+  timelimit_disk: 1
+  timelimit_pod: 1
+  timelimit_node: 1

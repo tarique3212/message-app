@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: postgres
   namespace: {{.Values.message.namespace}}
+  annotations:
+    prometheus.io/scrape: "true"
 spec:
   ports:
   - port: 5432

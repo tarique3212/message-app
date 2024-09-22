@@ -1,0 +1,26 @@
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: {{ .Values.storageName }}
+  labels:
+      chart: "{{ .Chart.Name }}"
+provisioner: kubernetes.io/no-provisioner
+reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: elasticsearch
+  labels:
+      chart: "{{ .Chart.Name }}"
+spec:
+  capacity:
+    storage: {{ .Values.capacityStorage }}
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  volumeMode: Filesystem
+  hostPath:
+    path: /home/appviewx/elastic

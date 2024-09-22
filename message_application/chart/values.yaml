@@ -1,7 +1,7 @@
 message:
   namespace: message
   replicas: 3
-  image: "your-dockerhub-username/message_service"
+  image: "message/message_service"
   tag: latest
   port: 5000
   imagePullPolicy: IfNotPresent
