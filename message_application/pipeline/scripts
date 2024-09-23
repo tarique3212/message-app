@@ -1,0 +1,64 @@
+pipeline {
+    agent any
+
+    environment {
+        AWS_REGION = 'us-west-2'
+        ECR_REPOSITORY = '021891604918.dkr.ecr.us-west-2.amazonaws.com/message-service'
+        IMAGE_TAG = 'latest'
+        HELM_CHART_DIR = 'message_application/messageapp' 
+        K8S_NAMESPACE = 'message'
+        HELM_RELEASE_NAME = 'message'
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git 'https://github.com/tarique3212/message-app.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh "cd message_image && docker build -t ${ECR_REPOSITORY}:${IMAGE_TAG} ."
+                }
+            }
+        }
+
+        stage('Push Docker Image to ECR') {
+            steps {
+                script {
+                    sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPOSITORY}"
+                    sh "docker tag ${ECR_REPOSITORY}:${IMAGE_TAG} ${ECR_REPOSITORY}:${IMAGE_TAG}"
+                    sh "docker push ${ECR_REPOSITORY}:${IMAGE_TAG}"
+                }
+            }
+        }
+
+        stage('Deploy to EKS') {
+            steps {
+                script {
+                    sh "helm upgrade --install ${HELM_RELEASE_NAME} ${HELM_CHART_DIR} --namespace ${K8S_NAMESPACE} --set image.repository=${ECR_REPOSITORY} --set image.tag=${IMAGE_TAG} --create-namespace"
+                }
+            }
+        }
+
+        stage('Enabling Nginx LoadBalancer') {
+            steps {
+                script {
+                    sh "kubectl apply -f message_application/ingress-controller.yaml"
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Deployment successful!'
+        }
+        failure {
+            echo 'Deployment failed!'
+        }
+    }
+}
+

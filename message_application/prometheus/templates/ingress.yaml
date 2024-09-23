@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: prometheus-alertmanager-ingress
+  name: prometheus-ingress
   namespace: prom
   annotations:
     kubernetes.io/ingress.class: nginx
@@ -10,6 +10,13 @@ spec:
   rules:
   - http:
       paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: prometheus-service
+            port:
+              number: 9090
       - path: /prometheus
         pathType: Prefix
         backend:
@@ -17,11 +24,4 @@ spec:
             name: prometheus-service
             port:
               number: 9090
-      - path: /alertmanager
-        pathType: Prefix
-        backend:
-          service:
-            name: alertmanager
-            port:
-              number: 9093
 

@@ -1,7 +1,7 @@
 provider "aws" {
-  region     = "us-west-2"
-  access_key = ""
-  secret_key = ""
+  region     = var.aws_region
+  access_key = var.aws_access_key
+  secret_key = var.aws_secret_key
 }
 
 # VPC for the EKS cluster
@@ -17,7 +17,7 @@ resource "aws_vpc" "eks_vpc" {
 resource "aws_subnet" "eks_subnet_a" {
   vpc_id            = aws_vpc.eks_vpc.id
   cidr_block        = "10.0.1.0/24"
-  availability_zone = "us-west-2a"
+  availability_zone = "${var.aws_region}a"
 
   map_public_ip_on_launch = true
 
@@ -29,7 +29,7 @@ resource "aws_subnet" "eks_subnet_a" {
 resource "aws_subnet" "eks_subnet_b" {
   vpc_id            = aws_vpc.eks_vpc.id
   cidr_block        = "10.0.2.0/24"
-  availability_zone = "us-west-2b"
+  availability_zone = "${var.aws_region}b"
 
   map_public_ip_on_launch = true
 
@@ -186,4 +186,3 @@ resource "aws_security_group" "eks_security_group" {
     Name = "eks-security-group"
   }
 }
-
