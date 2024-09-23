@@ -1,7 +1,7 @@
 message:
   namespace: message
   replicas: 3
-  image: "message/message_service"
+  image: "021891604918.dkr.ecr.us-west-2.amazonaws.com/message-service"
   tag: latest
   port: 5000
   imagePullPolicy: IfNotPresent
