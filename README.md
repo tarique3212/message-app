@@ -23,7 +23,7 @@ Upload Docker Image to ECR
 Install Message Application
 
 1) cd message_application/messageapp
-2) helm upgrade --install -n message --create-namespace message messageapp/ --set message.image="<account-id>.dkr.ecr.<region-name>.amazonaws.com/message-service" --set message.tag="latest
+2) helm upgrade --install -n message --create-namespace message messageapp/ --set message.image="<account-id>.dkr.ecr.<region-name>.amazonaws.com/message-service" --set message.tag="latest"
 
 Create Nginx Controller Loadbalancer
 
